@@ -1,0 +1,9 @@
+#devops
+black==24.10.0
+click==8.1.7
+pytest==8.3.3
+pytest-cov==5.0.0
+requests==2.32.3
+#rust based linter
+ruff==0.7.0
+
