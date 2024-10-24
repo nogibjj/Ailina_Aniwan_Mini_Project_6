@@ -1,58 +1,49 @@
 """Query the database"""
 
-import sqlite3
+import os
+from databricks import sql
+from dotenv import load_dotenv
+
+complex_query = """
+SELECT 
+    CASE 
+        WHEN w.major IS NOT NULL THEN 'STEM'  
+        ELSE 'Non-STEM'                        
+    END AS field_type, 
+    COUNT(DISTINCT r.major) AS number_of_majors,      
+    AVG(r.sharewomen) AS avg_share_women,             
+    AVG(r.median) AS avg_median_salary,               
+    SUM(r.employed) AS total_employed,                
+    SUM(r.unemployed) AS total_unemployed,            
+    AVG(r.unemployment_rate) AS avg_unemployment_rate 
+FROM recent_grads r
+LEFT JOIN women_stem w
+ON r.major_code = w.major_code                       
+GROUP BY field_type                                
+ORDER BY avg_median_salary DESC; 
+"""
 
 
-def query_create():
-    conn = sqlite3.connect("women-stem.db")
-    cursor = conn.cursor()
-    # create execution
-    cursor.execute(
-        """
-        INSERT INTO women_stem (
-            Rank, 
-            Major_code, 
-            Major, 
-            Major_category, 
-            Total, 
-            Men, 
-            Women, 
-            ShareWomen, 
-            Median) 
-            VALUES (
-                77, 1111, 'DATA SCIENCE', 'Computers & Mathematics', 500 , 300, 200, 0.4, 150000
-            )
-            """
-    )
-    conn.commit()
-    conn.close()
-    return "Create Success"
+def query():
+    load_dotenv()
+    with sql.connect(
+        server_hostname=os.getenv("server_hostname"),
+        http_path=os.getenv("http_path"),
+        access_token=os.getenv("access_token"),
+    ) as connection:
+
+        with connection.cursor() as cursor:
+            cursor.execute(complex_query)
+            result = cursor.fetchall()
+
+            for row in result:
+                print(row)
+
+            cursor.close()
+            connection.close()
+
+        return "query successful"
 
 
-def query_read():
-    conn = sqlite3.connect("women-stem.db")
-    cursor = conn.cursor()
-    # read execution
-    cursor.execute("SELECT * FROM women_stem")
-    conn.close()
-    return "Read Success"
-
-
-def query_update():
-    conn = sqlite3.connect("women-stem.db")
-    cursor = conn.cursor()
-    # update execution
-    cursor.execute("UPDATE women_stem SET Major = 'NUTRITION SCIENCE' WHERE id = 67 ")
-    conn.commit()
-    conn.close()
-    return "Update Success"
-
-
-def query_delete():
-    conn = sqlite3.connect("women-stem.db")
-    cursor = conn.cursor()
-    # delete execution
-    cursor.execute("DELETE FROM women_stem WHERE id = 76")
-    conn.commit()
-    conn.close()
-    return "Delete Success"
+if __name__ == "__main__":
+    query()

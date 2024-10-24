@@ -2,31 +2,20 @@
 ETL-Query script
 """
 
-from mylib.extract import extract
+from mylib.extract import extract1, extract2
 from mylib.transform_load import load
-from mylib.query import query_create, query_read, query_update, query_delete
-
+from mylib.query import query
 
 # Extract
-extract()
+print("Extracting data...")
+extract1()
+extract2()
 
-# Transform and Load
+
+# Transform and load
+print("Transforming data...")
 load()
 
 # Query
-query_create()
-query_read()
-query_update()
-query_delete()
-
-
-def results():
-    results = {
-        "extract": extract(),
-        "transform": load(),
-        "create": query_create(),
-        "read": query_read(),
-        "update": query_update(),
-        "delete": query_delete(),
-    }
-    return results
+print("Querying data...")
+query()

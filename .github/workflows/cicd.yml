@@ -1,6 +1,5 @@
 name: CI
-
-on: 
+on:
   push:
     branches: [ "main" ]
   pull_request:
@@ -12,11 +11,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+        with:
+          python-version: 3.9
       - name: install packages
         run: make install
-      - name: lint
-        run: make lint
       - name: format
         run: make format
+      - name: lint
+        run: make lint
       - name: test
+        env: 
+          access_token: ${{ secrets.access_token }}
+          server_hostname: ${{ secrets.server_hostname }}
+          http_path: ${{ secrets.http_path }}
         run: make test

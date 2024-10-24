@@ -1,58 +1,82 @@
 """
-Transforms and Loads data into the local SQLite3 database
-
+Transforms and Loads data into the databricks database
 """
 
-import sqlite3
+import os
+from databricks import sql
 import csv
+from dotenv import load_dotenv
 
 
-# load the csv file and insert into a new sqlite3 database
-def load(dataset="data/women-stem.csv"):
-    """ "Transforms and Loads data into the local SQLite3 database"""
+# Load the csv files and insert into a new Databricks database
+def load(dataset="data/women-stem.csv", dataset2="data/recent-grads.csv"):
+    """Transforms and Loads data into the Databricks database"""
+    load_dotenv()
 
-    payload = csv.reader(open(dataset, newline=""), delimiter=",")
-    # skips the header of csv
-    next(payload)
-    conn = sqlite3.connect("women-stem.db")
-    c = conn.cursor()
-    c.execute("DROP TABLE IF EXISTS women_stem")
-    c.execute(
-        """
-        CREATE TABLE women_stem (
-            id INTEGER PRIMARY KEY AUTOINCREMENT, 
-            Rank INTEGER, 
-            Major_code INTEGER, 
-            Major TEXT, 
-            Major_category TEXT, 
-            Total INTEGER, 
-            Men INTEGER, 
-            Women INTEGER, 
-            ShareWomen FLOAT, 
-            Median INTEGER
-        )
-    """
-    )
+    with open(dataset, newline="") as file1, open(dataset2, newline="") as file2:
+        payload = csv.reader(file1, delimiter=",")
+        payload2 = csv.reader(file2, delimiter=",")
+        # Skip the header of CSV
+        next(payload)
+        next(payload2)
 
-    valid_rows = [row for row in payload if len(row) == 9]
+        with sql.connect(
+            server_hostname=os.getenv("server_hostname"),
+            http_path=os.getenv("http_path"),
+            access_token=os.getenv("access_token"),
+        ) as connection:
+            with connection.cursor() as cursor:
+                # Create women_stem table
+                cursor.execute(
+                    """CREATE TABLE IF NOT EXISTS women_stem (
+                    rank INT, 
+                    major_code INT, 
+                    major STRING, 
+                    major_category STRING, 
+                    total INT, 
+                    men INT, 
+                    women INT, 
+                    sharewomen FLOAT, 
+                    median INT);"""
+                )
 
-    # insert
-    c.executemany(
-        """
-        INSERT INTO women_stem (
-            Rank, 
-            Major_code, 
-            Major, 
-            Major_category, 
-            Total, 
-            Men, 
-            Women, 
-            ShareWomen, 
-            Median) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-        valid_rows,
-    )
-    conn.commit()
-    conn.close()
+                # Check if the table is empty and insert data if needed
+                cursor.execute("SELECT * FROM women_stem")
+                result = cursor.fetchall()
+                if not result:
+                    insert_query = (
+                        """INSERT INTO women_stem VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"""
+                    )
+                    cursor.executemany(insert_query, payload)
 
-    return "women-stem.db"
+                # Create recent_grads table
+                cursor.execute(
+                    """CREATE TABLE IF NOT EXISTS recent_grads (
+                    rank INT,
+                    major_code INT,
+                    major STRING,
+                    total INT,
+                    men INT,
+                    women INT,
+                    major_category STRING,
+                    sharewomen FLOAT,
+                    employed INT,
+                    full_time INT,
+                    part_time INT,
+                    unemployed INT,
+                    unemployment_rate FLOAT,
+                    median INT);"""
+                )
+
+                # Check if the recent_grads table is empty and insert data if needed
+                cursor.execute("SELECT * FROM recent_grads")
+                result = cursor.fetchall()
+                if not result:
+                    insert_query_2 = """INSERT INTO recent_grads VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"""
+                    cursor.executemany(insert_query_2, payload2)
+
+    return "Dataset loaded to Databricks or already exists!"
+
+
+if __name__ == "__main__":
+    load()

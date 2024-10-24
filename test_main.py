@@ -1,32 +1,37 @@
 """
-Test main.py functions
+Test goes here
 """
 
-from main import results
+from mylib.extract import extract1, extract2
+from mylib.transform_load import load
+from mylib.query import query
+import os
 
 
-def test_functions():
-    result_dict = results()
+def test_extract():
+    """testing extract"""
+    extract1()
+    extract2()
 
-    assert result_dict["extract"] == "data/women-stem.csv", "Extract function failed"
-    print("Extract: Success")
+    assert os.path.exists("data/women-stem.csv")
+    assert os.path.exists("data/recent_grads.csv")
 
-    assert result_dict["transform"] == "women-stem.db", "Transform function failed"
-    print("Transform: Success")
 
-    assert result_dict["create"] == "Create Success", "Create query function failed"
-    print("Create Query: Success")
+def test_load():
+    """testing load"""
+    result = load()
+    assert result == "Dataset loaded to Databricks or already exists!"
 
-    assert result_dict["read"] == "Read Success", "Read query function failed"
-    print("Read Query: Success")
 
-    assert result_dict["update"] == "Update Success", "Update query function failed"
-    print("Update Query: Success")
-
-    assert result_dict["delete"] == "Delete Success", "Delete query function failed"
-    print("Delete Query: Success")
+def test_query():
+    """testing query"""
+    result = query()
+    assert result == "Query successful"
 
 
 if __name__ == "__main__":
-    test_functions()
-    print("All tests passed successfully!✨")
+    test_extract()
+    test_load()
+    test_query()
+
+    print("Everything passed!")
