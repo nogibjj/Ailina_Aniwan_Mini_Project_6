@@ -42,7 +42,7 @@ def query():
             cursor.close()
             connection.close()
 
-        return "query successful"
+        return "Query successful!"
 
 
 if __name__ == "__main__":
