@@ -4,10 +4,6 @@ import os
 from databricks import sql
 from dotenv import load_dotenv
 
-print("server_hostname:", os.getenv("server_hostname"))
-print("http_path:", os.getenv("http_path"))
-print("access_token:", os.getenv("access_token"))
-
 complex_query = """
 SELECT 
     CASE 
@@ -31,9 +27,9 @@ ORDER BY avg_median_salary DESC;
 def query():
     load_dotenv()
     with sql.connect(
-        server_hostname=os.getenv("server_hostname"),
-        http_path=os.getenv("http_path"),
-        access_token=os.getenv("access_token"),
+        server_hostname=os.getenv("SERVER_HOSTNAME"),
+        http_path=os.getenv("HTTP_PATH"),
+        access_token=os.getenv("ACCESS_TOKEN"),
     ) as connection:
 
         with connection.cursor() as cursor:
