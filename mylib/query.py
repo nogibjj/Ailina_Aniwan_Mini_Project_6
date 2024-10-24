@@ -4,6 +4,10 @@ import os
 from databricks import sql
 from dotenv import load_dotenv
 
+print("server_hostname:", os.getenv("server_hostname"))
+print("http_path:", os.getenv("http_path"))
+print("access_token:", os.getenv("access_token"))
+
 complex_query = """
 SELECT 
     CASE 

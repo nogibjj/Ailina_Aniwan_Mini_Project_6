@@ -7,6 +7,10 @@ from databricks import sql
 import csv
 from dotenv import load_dotenv
 
+print("server_hostname:", os.getenv("server_hostname"))
+print("http_path:", os.getenv("http_path"))
+print("access_token:", os.getenv("access_token"))
+
 
 # Load the csv files and insert into a new Databricks database
 def load(dataset="data/women-stem.csv", dataset2="data/recent-grads.csv"):
