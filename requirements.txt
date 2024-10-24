@@ -4,6 +4,9 @@ click==8.1.7
 pytest==8.3.3
 pytest-cov==5.0.0
 requests==2.32.3
+python-dotenv==1.0.1
+databricks-sql-connector==3.5.0
 #rust based linter
 ruff==0.7.0
+
 

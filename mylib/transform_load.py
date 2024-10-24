@@ -72,7 +72,7 @@ def load(dataset="data/women-stem.csv", dataset2="data/recent-grads.csv"):
                 cursor.execute("SELECT * FROM recent_grads")
                 result = cursor.fetchall()
                 if not result:
-                    insert_query_2 = """INSERT INTO recent_grads VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"""
+                    insert_query_2 = """INSERT INTO recent_grads VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"""
                     cursor.executemany(insert_query_2, payload2)
 
     return "Dataset loaded to Databricks or already exists!"

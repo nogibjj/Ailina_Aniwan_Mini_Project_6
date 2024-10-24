@@ -16,4 +16,4 @@ container-lint:
 
 refactor: format lint
 
-all: install format lint test
+all: install format lint test 
